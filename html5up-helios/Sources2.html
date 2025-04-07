@@ -1,0 +1,318 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Platées - Sources</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="icon" type="image/png" href="images/favicon.png">
+		<link rel="stylesheet" href="assets/css/main.css" />
+	</head>
+	<body class="right-sidebar is-preload">
+		<div id="page-wrapper">
+
+			<!-- Header -->
+			<div id="header">
+
+				<!-- Inner -->
+					<div class="inner">
+						<header>
+							<h1>Sources littéraires</h1>
+						</header>
+					</div>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul>
+							<li><a href="Platée site web.html">Menu</a></li>
+							<li><a href="Bibliographie.html">Bibliographie</a></li>
+						</ul>
+					</nav>
+
+			</div>
+
+		<!-- Main -->
+			<div class="wrapper style2">
+				<article id="main" class="container special">
+					<div style="height: 100px;"></div>
+					<header></header>
+					
+					<h3>Nombreuses sont les sources littéraires à mentionner Platées, que ce soit à l'époque classique ou à des époques postérieurs. Voici ici un tableau où sont inscrites toutes les mentions de Platées concernant de près ou de loin ses relations avec les autres. Bien que j'aspire à être exhaustif (pour la période classique en tout cas), ce travail reste encore incomplet. Néanmoins, c'est un aperçu non négligeable.</h3>
+					
+					<section id="sources-section">
+						
+					</section>
+				</article>
+			</div>
+
+			<!-- Footer -->
+			<div id="footer">
+				<div class="container">
+					<div class="row">
+						<!-- Copyright -->
+						<div class="copyright">
+							<ul class="menu">
+								<li>&copy; Plataia Project. All rights reserved.</li>
+								<li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Scripts -->
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/jquery.dropotron.min.js"></script>
+		<script src="assets/js/jquery.scrolly.min.js"></script>
+		<script src="assets/js/jquery.scrollex.min.js"></script>
+		<script src="assets/js/browser.min.js"></script>
+		<script src="assets/js/breakpoints.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<script src="assets/js/main.js"></script>
+		
+		<script>
+		
+		document.addEventListener('DOMContentLoaded', function() {
+			const section = document.getElementById('sources-section');
+			
+			const tableContainer = document.createElement('div');
+			tableContainer.className = 'table-container';
+			tableContainer.style.overflow = 'auto';
+			tableContainer.style.maxWidth = '100%';
+			section.appendChild(tableContainer);
+			
+			const table = document.createElement('table');
+			table.className = 'sources-table';
+			table.style.width = '100%';
+			table.style.borderCollapse = 'collapse';
+			table.style.marginTop = '20px';
+			table.style.marginBottom = '40px';
+			tableContainer.appendChild(table);
+			
+			const thead = document.createElement('thead');
+			const headerRow = document.createElement('tr');	
+
+			const columns = [
+				{ key: 'Ouvrage', name: 'Ouvrage' },
+				{ key: 'Emplacement', name: 'Emplacement' },
+				{ key: 'Citation', name: 'Citation' },
+				{ key: 'Explication', name: 'Explication' }
+			];
+			
+			columns.forEach(column => {
+				const th = document.createElement('th');
+				th.textContent = column.name;
+				th.style.padding = '10px';
+				th.style.backgroundColor = '#3a3a3a';
+				th.style.color = 'white';
+				th.style.textAlign = 'left';
+				th.style.fontWeight = 'bold';
+				th.style.borderBottom = '2px solid #ddd';
+				headerRow.appendChild(th);
+			});
+			
+			thead.appendChild(headerRow);
+			table.appendChild(thead);
+			
+			const tbody = document.createElement('tbody');
+			table.appendChild(tbody);
+						
+			Papa.parse('Tableau.CSV', {
+				download: true,
+				header: true,
+				encoding: "UTF-8",
+				skipEmptyLines: true,
+				complete: function(results) {
+					
+					if (results.data && results.data.length > 0) {
+
+						results.data.forEach((row, index) => {
+							if (!row['Ouvrage'] && !row['Emplacement'] && !row['Citation']) {
+								return; 
+							}
+							
+							const tr = document.createElement('tr');
+							tr.style.borderBottom = '1px solid #ddd';
+							
+							if (index % 2 === 0) {
+								tr.style.backgroundColor = '#f9f9f9';
+							}
+							
+							columns.forEach(column => {
+								const td = document.createElement('td');
+								td.textContent = row[column.key] || '';
+								td.style.padding = '10px';
+								
+								if (column.key === 'Citation') {
+									td.style.fontStyle = 'italic';
+								}
+								
+								tr.appendChild(td);
+							});
+							
+							tbody.appendChild(tr);
+						});
+						
+						const infoDiv = document.createElement('div');
+						infoDiv.className = 'sources-info';
+						infoDiv.textContent = `${results.data.length} sources littéraires répertoriées.`;
+						infoDiv.style.marginTop = '15px';
+						infoDiv.style.fontStyle = 'italic';
+						infoDiv.style.textAlign = 'right';
+						section.appendChild(infoDiv);
+						
+						addFilteringCapabilities(table, results.data, columns, tbody);
+						
+					} else {
+						const errorRow = document.createElement('tr');
+						const errorCell = document.createElement('td');
+						errorCell.colSpan = columns.length;
+						errorCell.textContent = 'Aucune donnée trouvée.';
+						errorCell.style.padding = '20px';
+						errorCell.style.textAlign = 'center';
+						errorRow.appendChild(errorCell);
+						tbody.appendChild(errorRow);
+					}
+				},
+				error: function(error) {
+					tbody.innerHTML = '';
+					const errorRow = document.createElement('tr');
+					const errorCell = document.createElement('td');
+					errorCell.colSpan = columns.length;
+					errorCell.textContent = 'Erreur lors du chargement des données.';
+					errorCell.style.padding = '20px';
+					errorCell.style.textAlign = 'center';
+					errorCell.style.color = 'red';
+					errorRow.appendChild(errorCell);
+					tbody.appendChild(errorRow);
+				}
+			});
+		});
+
+		function addFilteringCapabilities(table, data, columns, tbody) {
+			const filterContainer = document.createElement('div');
+			filterContainer.className = 'filter-container';
+			filterContainer.style.marginBottom = '20px';
+			filterContainer.style.display = 'flex';
+			filterContainer.style.flexWrap = 'wrap';
+			filterContainer.style.gap = '10px';
+			table.parentNode.insertBefore(filterContainer, table);
+			
+			const searchInput = document.createElement('input');
+			searchInput.type = 'text';
+			searchInput.placeholder = 'Rechercher dans toutes les colonnes...';
+			searchInput.style.padding = '8px';
+			searchInput.style.borderRadius = '4px';
+			searchInput.style.border = '1px solid #ddd';
+			searchInput.style.flexGrow = '1';
+			filterContainer.appendChild(searchInput);
+			
+			const workSelect = document.createElement('select');
+			workSelect.style.padding = '8px';
+			workSelect.style.borderRadius = '4px';
+			workSelect.style.border = '1px solid #ddd';
+			
+			const defaultOption = document.createElement('option');
+			defaultOption.value = '';
+			defaultOption.textContent = 'Tous les ouvrages';
+			workSelect.appendChild(defaultOption);
+			
+			const works = [...new Set(data.map(item => item['Ouvrage']).filter(Boolean))];
+			works.sort();
+			
+			works.forEach(work => {
+				const option = document.createElement('option');
+				option.value = work;
+				option.textContent = work.length > 50 ? work.substring(0, 47) + '...' : work;
+				option.title = work; 
+				workSelect.appendChild(option);
+			});
+			
+			filterContainer.appendChild(workSelect);
+			
+			function filterTable() {
+				const searchText = searchInput.value.toLowerCase();
+				const selectedWork = workSelect.value;
+				
+				tbody.innerHTML = '';
+				
+				const filteredData = data.filter(row => {
+
+					if (selectedWork && row['Ouvrage'] !== selectedWork) {
+						return false;
+					}
+					
+					if (searchText) {
+						return columns.some(column => {
+							const cellValue = String(row[column.key] || '').toLowerCase();
+							return cellValue.includes(searchText);
+						});
+					}
+					
+					return true;
+				});
+				
+				if (filteredData.length > 0) {
+					filteredData.forEach((row, index) => {
+						const tr = document.createElement('tr');
+						tr.style.borderBottom = '1px solid #ddd';
+						
+						if (index % 2 === 0) {
+							tr.style.backgroundColor = '#f9f9f9';
+						}
+						
+						columns.forEach(column => {
+							const td = document.createElement('td');
+							td.textContent = row[column.key] || '';
+							td.style.padding = '10px';
+							
+							if (column.key === 'Citation') {
+								td.style.fontStyle = 'italic';
+							}
+							
+							tr.appendChild(td);
+						});
+						
+						tbody.appendChild(tr);
+					});
+					
+					updateResultCount(filteredData.length, data.length);
+				} else {
+					const noResultRow = document.createElement('tr');
+					const noResultCell = document.createElement('td');
+					noResultCell.colSpan = columns.length;
+					noResultCell.textContent = 'Aucun résultat trouvé.';
+					noResultCell.style.padding = '20px';
+					noResultCell.style.textAlign = 'center';
+					noResultRow.appendChild(noResultCell);
+					tbody.appendChild(noResultRow);
+					
+					updateResultCount(0, data.length);
+				}
+			}
+			
+			function updateResultCount(filteredCount, totalCount) {
+				let infoDiv = document.querySelector('.sources-info');
+				if (!infoDiv) {
+					infoDiv = document.createElement('div');
+					infoDiv.className = 'sources-info';
+					infoDiv.style.marginTop = '15px';
+					infoDiv.style.fontStyle = 'italic';
+					infoDiv.style.textAlign = 'right';
+					table.parentNode.appendChild(infoDiv);
+				}
+				
+				if (filteredCount === totalCount) {
+					infoDiv.textContent = `${totalCount} sources littéraires répertoriées.`;
+				} else {
+					infoDiv.textContent = `${filteredCount} sources affichées sur ${totalCount} au total.`;
+				}
+			}
+			
+			searchInput.addEventListener('input', filterTable);
+			workSelect.addEventListener('change', filterTable);
+		}
+		</script>
+	</body>
+</html>
